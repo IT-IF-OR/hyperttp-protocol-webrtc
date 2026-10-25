@@ -1,6 +1,6 @@
 {
   "name": "@hyperttp/protocol-webrtc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WebRTC peer sessions and media-stream management for Hyperttp.",
   "license": "MIT",
   "author": "dirold2",
@@ -24,7 +24,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && d-build",
+    "build": "tsc && esbuild 'dist/**/*.js' --outdir=dist --allow-overwrite --minify --sourcemap && d-build",
     "dist": "d-dist",
     "deploy": "npm run build && npm run dist",
     "pub": "d-publish",
