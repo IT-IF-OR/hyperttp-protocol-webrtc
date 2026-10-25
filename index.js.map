@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.ts"],
+  "sourcesContent": ["import type { HyperProtocol } from \"@hyperttp/types\";\nimport type {\n  WebRtcInput,\n  WebRtcServerInput,\n  WebRtcServerResponse,\n  WebRtcServerHandler,\n} from \"./types/index.js\";\nimport { WebRtcReceiver } from \"./receiver.js\";\nimport { WebRtcSender } from \"./sender.js\";\n\nexport function createWebRtcProtocol(\n  options: { handler?: WebRtcServerHandler } = {},\n): HyperProtocol<WebRtcInput, unknown, WebRtcServerInput, WebRtcServerResponse, \"webrtc\"> {\n  return {\n    protocol: \"webrtc\",\n    name: \"WebRtcProtocol\",\n    sender: new WebRtcSender(),\n    receiver: new WebRtcReceiver(options),\n  };\n}\n\nexport const WebRtcProtocol = createWebRtcProtocol();\n\nexport { WebRtcReceiver } from \"./receiver.js\";\nexport { WebRtcSender } from \"./sender.js\";\n\nexport type {\n  WebRtcTransportRequest,\n  WebRtcAction,\n  WebRtcInput,\n  WebRtcLocalStream,\n  WebRtcRequestOptions,\n  WebRtcServerInput,\n  WebRtcServerResponse,\n  WebRtcServerHandler,\n  WebRtcClientMethods,\n} from \"./types/index.js\";\n"],
+  "mappings": "aAOA,OAAS,kBAAAA,MAAsB,gBAC/B,OAAS,gBAAAC,MAAoB,cAEvB,gBAAU,qBACdC,EAA6C,CAAA,EAAE,CAE/C,MAAO,CACL,SAAU,SACV,KAAM,iBACN,OAAQ,IAAID,EACZ,SAAU,IAAID,EAAeE,CAAO,EAExC,CAEO,aAAM,eAAiB,qBAAoB,EAElD,OAAS,mBAAsB,gBAC/B,OAAS,iBAAoB",
+  "names": ["WebRtcReceiver", "WebRtcSender", "options"]
+}
