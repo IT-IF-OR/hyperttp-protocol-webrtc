@@ -5,6 +5,7 @@ import type {
   WebRtcServerResponse,
   WebRtcServerHandler,
 } from "./types/index.js";
+import { createWebRtcServer } from "./server.js";
 import { WebRtcReceiver } from "./receiver.js";
 import { WebRtcSender } from "./sender.js";
 
@@ -14,6 +15,7 @@ export function createWebRtcProtocol(
   return {
     protocol: "webrtc",
     name: "WebRtcProtocol",
+    server: createWebRtcServer,
     sender: new WebRtcSender(),
     receiver: new WebRtcReceiver(options),
   };
@@ -35,3 +37,13 @@ export type {
   WebRtcServerHandler,
   WebRtcClientMethods,
 } from "./types/index.js";
+
+/** Opt-in control ACK; application messages require a separately supplied handler. */
+export const webRtcControlHandler: WebRtcServerHandler = (request) => {
+  if (request.action === "connect" || request.action === "stream") {
+    return { status: 200, sessionId: request.sessionId };
+  }
+  return { status: 501, payload: { error: "No application handler for this action." } };
+};
+
+export type { WebRtcRouteContext, WebRtcSignalOptions, WebRtcServerMethods } from "./server.js";
