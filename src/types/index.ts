@@ -1,5 +1,8 @@
 import type { ServerRequestContext, TransportRequest, UniversalResponse } from "@hyperttp/types";
 
+/** A null candidate marks completion of ICE gathering; an empty candidate marks end-of-candidates. */
+export type WebRtcIceCandidate = RTCIceCandidateInit | null;
+
 export type WebRtcAction = "connect" | "stream" | "datachannel" | "offer" | "answer" | "candidate";
 
 /** Opaque media handle: interpreted by the selected browser or server transport. */
@@ -13,7 +16,9 @@ export interface WebRtcInput {
   readonly sessionId?: string | undefined;
   readonly offer?: RTCSessionDescriptionInit | undefined;
   readonly answer?: RTCSessionDescriptionInit | undefined;
-  readonly candidate?: RTCIceCandidateInit | undefined;
+  readonly candidate?: WebRtcIceCandidate | undefined;
+  /** Optional non-negative generation counter managed by the signaling application. */
+  readonly iceGeneration?: string | number | undefined;
   readonly iceServers?: RTCIceServer[] | undefined;
   readonly localStream?: WebRtcLocalStream | undefined;
   readonly dataChannelPayload?: unknown;
@@ -47,7 +52,9 @@ export interface WebRtcServerInput {
   readonly answer?: RTCSessionDescriptionInit | undefined;
   readonly headers: Readonly<Record<string, string | string[]>>;
   readonly offer?: RTCSessionDescriptionInit | undefined;
-  readonly candidate?: RTCIceCandidateInit | undefined;
+  readonly candidate?: WebRtcIceCandidate | undefined;
+  /** Optional non-negative generation counter managed by the signaling application. */
+  readonly iceGeneration?: string | number | undefined;
   readonly payload?: unknown;
 }
 
@@ -55,7 +62,9 @@ export interface WebRtcServerResponse {
   readonly sessionId?: string | undefined;
   readonly status?: number | undefined;
   readonly answer?: RTCSessionDescriptionInit | undefined;
-  readonly candidate?: RTCIceCandidateInit | undefined;
+  readonly candidate?: WebRtcIceCandidate | undefined;
+  /** Optional non-negative generation counter managed by the signaling application. */
+  readonly iceGeneration?: string | number | undefined;
   readonly payload?: unknown;
   readonly headers?: Record<string, string> | undefined;
 }

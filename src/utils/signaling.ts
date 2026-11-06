@@ -1,4 +1,4 @@
-import type { WebRtcAction } from "../types/index.js";
+import type { WebRtcAction, WebRtcIceCandidate } from "../types/index.js";
 import { HyperClientError } from "./errors.js";
 
 export function invalidSignal(message: string): never {
@@ -11,7 +11,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export function parseSignal(value: unknown) {
   if (!isRecord(value)) invalidSignal("WebRTC body must be an object.");
-  const { action, sessionId, offer, answer, candidate } = value;
+  const { action, sessionId, offer, answer, candidate, iceGeneration } = value;
   if (
     action !== "connect" &&
     action !== "stream" &&
@@ -37,7 +37,22 @@ export function parseSignal(value: unknown) {
     )
       invalidSignal(`Invalid WebRTC ${name}.`);
   }
-  if (candidate !== undefined) {
+  if (
+    iceGeneration !== undefined &&
+    !(
+      (typeof iceGeneration === "string" &&
+        iceGeneration.length > 0 &&
+        iceGeneration.length <= 256) ||
+      (typeof iceGeneration === "number" &&
+        Number.isSafeInteger(iceGeneration) &&
+        iceGeneration >= 0)
+    )
+  ) {
+    invalidSignal(
+      "iceGeneration must be a non-empty string of at most 256 characters or a non-negative safe integer.",
+    );
+  }
+  if (candidate !== undefined && candidate !== null) {
     if (!isRecord(candidate) || typeof candidate.candidate !== "string") {
       invalidSignal("Invalid ICE candidate.");
     }
@@ -68,7 +83,8 @@ export function parseSignal(value: unknown) {
     sessionId: sessionId as string | undefined,
     offer: offer as RTCSessionDescriptionInit | undefined,
     answer: answer as RTCSessionDescriptionInit | undefined,
-    candidate: candidate as RTCIceCandidateInit | undefined,
+    candidate: candidate as WebRtcIceCandidate | undefined,
+    iceGeneration: iceGeneration as string | number | undefined,
     payload: value.payload,
   };
 }

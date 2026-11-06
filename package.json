@@ -1,6 +1,6 @@
 {
   "name": "@hyperttp/protocol-webrtc",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Typed WebRTC protocol adapter for Hyperttp.",
   "license": "MIT",
   "author": "dirold2",
@@ -31,22 +31,34 @@
     "format:check": "oxfmt src --check",
     "test": "vitest run",
     "dev": "tsx src/index.ts",
-    "build": "node ../../scripts/build-package.ts",
+    "pub": "d-publish",
+    "dist": "d-dist",
+    "build": "tsc && esbuild \"dist/**/*.js\" --outdir=dist --allow-overwrite --minify --sourcemap && d-build",
     "clean": "node --input-type=module -e 'import { rmSync } from \"node:fs\"; rmSync(\"dist\", { recursive: true, force: true });'",
-    "test:typecheck": "tsc -p tsconfig.test.json"
+    "test:typecheck": "tsc -p tsconfig.test.json",
+    "typecheck:shared": "tsc -p tsconfig.check.shared.json",
+    "typecheck:node": "tsc -p tsconfig.check.node.json",
+    "typecheck:bun": "tsc -p tsconfig.check.bun.json",
+    "typecheck:deno": "tsc -p tsconfig.check.deno.json",
+    "test:node": "RAGU_TEST_RUNTIME=node node node_modules/vitest/vitest.mjs run && node --import tsx tests/runtime/node.ts",
+    "test:bun": "RAGU_TEST_RUNTIME=bun bun --bun node_modules/vitest/vitest.mjs run && bun tests/runtime/bun.ts",
+    "test:deno": "RAGU_TEST_RUNTIME=deno deno run --no-config --no-lock --node-modules-dir=manual --cached-only --no-prompt -A node_modules/vitest/vitest.mjs run && deno run --unstable-sloppy-imports tests/runtime/deno.ts"
   },
   "devDependencies": {
+    "@dirold2/dev-tools": "^1.1.3",
     "@types/bun": "^1.4.4",
+    "@types/deno": "^2.7.0",
     "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "^5.1.0",
     "esbuild": "^0.28.2",
     "oxfmt": "^0.76.0",
-    "oxlint": "^1.90.0",
+    "oxlint": "^1.91.0",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
   },
   "peerDependencies": {
-    "@hyperttp/types": "^0.5.3"
+    "@hyperttp/types": "^0.5.4"
   },
   "engines": {
     "node": ">=20"

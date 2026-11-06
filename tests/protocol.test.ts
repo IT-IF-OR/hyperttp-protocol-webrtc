@@ -187,6 +187,65 @@ describe("receiver", () => {
     ).toEqual({ candidate: "" });
   });
 
+  it.each(
+    [
+      { candidate: "candidate:1", sdpMid: "0", sdpMLineIndex: 0, usernameFragment: "ufrag" },
+      { candidate: "", sdpMid: "0", usernameFragment: "ufrag" },
+      null,
+    ].flatMap((candidate) =>
+      [0, 42, "1", "opaque-generation/abc", "x".repeat(256)].map((iceGeneration) => ({
+        candidate,
+        iceGeneration,
+      })),
+    ),
+  )(
+    "preserves trickle ICE messages and generation end-to-end: %j",
+    ({ candidate, iceGeneration }) => {
+      const sender = new WebRtcSender();
+      const receiver = new WebRtcReceiver();
+      const prepared = sender.prepare(
+        {
+          protocol: "webrtc",
+          input: { action: "candidate", peerUrl: "peer", candidate, iceGeneration },
+        },
+        context(),
+      );
+      const received = receiver.receive(prepared, context());
+      expect(received).toMatchObject({ candidate, iceGeneration });
+      expect(
+        receiver.respond(
+          { candidate: received.candidate, iceGeneration: received.iceGeneration },
+          context(),
+        ).body,
+      ).toMatchObject({ candidate, iceGeneration });
+      const wire = JSON.parse(JSON.stringify(prepared.body));
+      expect(receiver.receive(incoming(wire), context())).toMatchObject({
+        candidate,
+        iceGeneration,
+      });
+    },
+  );
+
+  it.each([
+    { action: "candidate" },
+    { action: "candidate", candidate: {} },
+    { action: "candidate", candidate: { candidate: 1 } },
+    { action: "candidate", candidate: { candidate: "x", sdpMid: 1 } },
+    { action: "candidate", candidate: { candidate: "x", usernameFragment: false } },
+    { action: "candidate", candidate: { candidate: "x", sdpMLineIndex: 65536 } },
+    ...[-1, 1.5, Number.MAX_SAFE_INTEGER + 1, null, "", "x".repeat(257), true, {}].map(
+      (iceGeneration) => ({
+        action: "candidate",
+        candidate: null,
+        iceGeneration,
+      }),
+    ),
+  ])("rejects invalid trickle ICE data %j", (body) => {
+    expect(() => new WebRtcReceiver().receive(incoming(body), context())).toThrowError(
+      expect.objectContaining({ code: "INVALID_WEBRTC_SIGNAL", statusCode: 400 }),
+    );
+  });
+
   it("reads peer header case-insensitively and rejects ambiguous identity", () => {
     const receiver = new WebRtcReceiver();
     expect(

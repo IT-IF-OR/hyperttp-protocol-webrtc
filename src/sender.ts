@@ -94,6 +94,7 @@ export class WebRtcSender implements HyperSender<
         offer: input.offer,
         answer: input.answer,
         candidate: input.candidate,
+        iceGeneration: input.iceGeneration,
       },
       ...(inputSignal ? { signal: inputSignal } : {}),
       timeout: input.timeout,

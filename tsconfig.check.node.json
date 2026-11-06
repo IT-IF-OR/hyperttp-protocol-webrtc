@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.check.shared.json",
+  "compilerOptions": { "types": ["node"] },
+  "include": ["src/**/*.ts", "tests/runtime/shared.ts", "tests/runtime/node.ts"]
+}

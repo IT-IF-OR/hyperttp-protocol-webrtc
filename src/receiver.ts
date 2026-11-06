@@ -78,6 +78,7 @@ export class WebRtcReceiver implements HyperReceiver<
         sessionId: response.sessionId,
         answer: response.answer,
         candidate: response.candidate,
+        iceGeneration: response.iceGeneration,
         payload: response.payload,
       },
     };

@@ -28,6 +28,7 @@ export { WebRtcSender } from "./sender.js";
 
 export type {
   WebRtcTransportRequest,
+  WebRtcIceCandidate,
   WebRtcAction,
   WebRtcInput,
   WebRtcLocalStream,

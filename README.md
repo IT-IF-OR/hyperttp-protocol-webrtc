@@ -11,6 +11,14 @@ The package does not create `RTCPeerConnection` instances, negotiate connections
 - A `HyperTransport` that can execute requests for `"webrtc"`; receiving requests also requires the host's inbound transport/core wiring.
 - **DOM types for TypeScript consumers**, including server-side consumers: public types reference `RTCIceServer`, `RTCSessionDescriptionInit`, and `RTCIceCandidateInit`. Include `"DOM"` alongside your chosen ECMAScript library in `compilerOptions.lib`, for example `["ES2022", "DOM"]`. This is a compile-time requirement, not a requirement to run a browser or install a WebRTC runtime.
 
+## Development checks
+
+Run `bun install`, then use `bun run typecheck:shared` and `bun run typecheck:node`,
+`typecheck:bun`, or `typecheck:deno` for the corresponding type environments.
+Run `bun run test:node`, `test:bun`, or `test:deno` for runtime-verified smoke
+tests, and `bun run test` for the full Vitest suite. Each runtime must be
+installed separately. See [tests/README.md](tests/README.md) for details and limitations.
+
 ## Protocol instances
 
 `WebRtcProtocol` is the default singleton with a sender and a receiver without an application handler. Use the factory for an independently configured protocol:
@@ -156,7 +164,7 @@ The URL is interpreted by the selected transport; it does not select an HTTP plu
 
 `WebRtcTransportRequest extends TransportRequest` describes the WebRTC-specific request metadata. `prepare()` builds a POST-shaped request with `protocol: "webrtc"`, the peer URL, JSON content type, an action/payload body, signaling fields, and transport options such as `iceServers`, `localStream`, receive flags, and `channelLabel`.
 
-The signaling contract carries `offer`, `answer`, `candidate`, and `sessionId` through the relevant client/server request and response types. `sessionId` is application-supplied correlation data, not a session allocated or tracked by this package. The adapter does not generate SDP, apply descriptions, buffer ICE candidates, or validate signaling state.
+The signaling contract carries `offer`, `answer`, `candidate`, and `sessionId` through the relevant client/server request and response types. `sessionId` is application-supplied correlation data, not a session allocated or tracked by this package. The optional `iceGeneration` is an opaque, non-empty string of at most 256 characters, supplied by the application to correlate signaling across ICE restarts. Existing non-negative safe integer values are also accepted for compatibility; values retain their original type and are not generated, converted, or tracked by this adapter. Candidates retain their standard `usernameFragment` when supplied. For end-of-candidates, `candidate: { candidate: "" }` and `candidate: null` are both accepted and preserved; an omitted candidate remains invalid for the `candidate` action. The adapter does not generate SDP, apply descriptions, buffer ICE candidates, or validate signaling state.
 With `@hyperttp/transport-webrtc`, these actions are application messages over an
 already negotiated DataChannel. They do not control the transport's HTTP SDP
 negotiation, which is owned by the transport.
