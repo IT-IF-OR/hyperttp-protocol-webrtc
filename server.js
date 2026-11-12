@@ -1,0 +1,2 @@
+"use strict";export function createWebRtcServer(r){return{signal(e,o){if(!e.startsWith("/")||e.startsWith("//")||/[?#\\\s]/u.test(e)||[...e].some(t=>t.codePointAt(0)<32||t.codePointAt(0)===127)||new URL(e,"http://localhost").pathname!==e)throw new Error("[WebRtcProtocol] Signaling path must be an absolute literal pathname.");const{authorize:n,handler:i}=o;return r.configure({protocol:"webrtc",signaling:{path:e,...n?{authorize:t=>n({request:t,services:r.services})}:{}},handler:(t,s)=>i({request:t,context:s,services:r.services})})}}}
+//# sourceMappingURL=server.js.map

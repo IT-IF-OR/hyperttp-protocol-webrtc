@@ -1,5 +1,0 @@
-{
-  "extends": "./tsconfig.check.shared.json",
-  "compilerOptions": { "types": ["deno"] },
-  "include": ["src/**/*.ts", "tests/runtime/shared.ts", "tests/runtime/deno.ts"]
-}
